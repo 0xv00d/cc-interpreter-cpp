@@ -26,15 +26,12 @@ int main(int argc, char *argv[]) {
     if (command == "tokenize") {
         std::string file_contents = read_file_contents(argv[2]);
         
-        if (!file_contents.empty()) {
-            lox::Scanner scanner = lox::Scanner(file_contents);
-            auto tokens = scanner.scan_tokens();
+        lox::Scanner scanner = lox::Scanner(file_contents);
+        auto tokens = scanner.scan_tokens();
+        for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
 
-            for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
+        return 0;
 
-            return 0;
-        }
-        
     } else {
         std::cerr << "Unknown command: " << command << std::endl;
         return 1;
