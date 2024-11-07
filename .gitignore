@@ -53,3 +53,8 @@ dkms.conf
 
 build
 vcpkg_installed
+
+.vs
+.vscode
+codecraf.*
+*.exe.metagen

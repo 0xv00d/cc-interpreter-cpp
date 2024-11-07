@@ -1,9 +1,12 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
 
+#include "scanner.hpp"
+
+void run(std::string);
+
+int repl();
 std::string read_file_contents(const std::string& filename);
 
 int main(int argc, char *argv[]) {
@@ -11,8 +14,7 @@ int main(int argc, char *argv[]) {
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
 
-    // You can use print statements as follows for debugging, they'll be visible when running tests.
-    std::cerr << "Logs from your program will appear here!" << std::endl;
+    if (argc == 1) return repl();
 
     if (argc < 3) {
         std::cerr << "Usage: ./your_program tokenize <filename>" << std::endl;
@@ -25,14 +27,34 @@ int main(int argc, char *argv[]) {
         std::string file_contents = read_file_contents(argv[2]);
         
         if (!file_contents.empty()) {
-            std::cerr << "Scanner not implemented" << std::endl;
+            lox::Scanner scanner = lox::Scanner(file_contents);
+            auto tokens = scanner.scan_tokens();
+
+            for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
+
             return 1;
         }
-        std::cout << "EOF  null" << std::endl; // Placeholder, remove this line when implementing the scanner
         
     } else {
         std::cerr << "Unknown command: " << command << std::endl;
         return 1;
+    }
+
+    return 0;
+}
+
+void run(std::string source) {
+
+}
+
+int repl() {
+    while (true) {
+        std::cout << "> ";
+
+        std::string input;
+        std::getline(std::cin, input);
+
+        if (input == "exit") break;
     }
 
     return 0;
