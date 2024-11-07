@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
             for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
 
-            return 1;
+            return 0;
         }
         
     } else {
