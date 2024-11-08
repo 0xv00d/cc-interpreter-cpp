@@ -1,12 +1,11 @@
 #include "main.hpp"
 
 namespace lox {
-bool hadError = false;
+extern bool had_error;
 
 static void report(int line, std::string where, std::string message) {
-    //std::cerr << "[" << line << "] Error " << where << ": " << message;
-    std::cerr << "[" << line << "] Error: " << message;
-    hadError = true;
+    std::cerr << "[line " << line << "] Error: " << where << message << std::endl;
+    had_error = true;
 }
 
 static void error(int line, std::string message) {

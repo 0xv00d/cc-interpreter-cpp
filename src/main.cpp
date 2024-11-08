@@ -3,6 +3,9 @@
 #include <iostream>
 
 #include "scanner.hpp"
+#include "errors.hpp"
+
+bool lox::had_error = false;
 
 void run(std::string);
 
@@ -29,6 +32,8 @@ int main(int argc, char *argv[]) {
         lox::Scanner scanner = lox::Scanner(file_contents);
         auto tokens = scanner.scan_tokens();
         for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
+
+        if (lox::had_error) return 65;
 
         return 0;
 
