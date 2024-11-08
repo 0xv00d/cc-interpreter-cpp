@@ -29,6 +29,7 @@ enum TokenType {
 };
 
 extern std::map<TokenType, std::string> token_string;
+extern std::map<std::string, TokenType> keywords;
 
 struct Token {
 private:

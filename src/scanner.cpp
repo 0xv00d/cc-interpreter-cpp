@@ -30,6 +30,15 @@ std::map<TokenType, std::string> token_string = {
     {tk_EOF, "EOF"}
 };
 
+std::map<std::string, TokenType> keywords = {
+    {"and", AND}, {"class", CLASS}, {"else", ELSE},
+    {"false", FALSE}, {"for", FOR}, {"fun", FUN},
+    {"if", IF}, {"nil", NIL}, {"or", OR},
+    {"print", PRINT}, {"return", RETURN},
+    {"super", SUPER}, {"this", THIS}, {"true", TRUE},
+    {"var", VAR}, {"while", WHILE}
+};
+
 void Scanner::addToken(TokenType type, std::any literal) {
     std::string text = source_.substr(start_, current_ - start_);
     tokens_.emplace_back(Token{type, text, literal, line_});
@@ -82,7 +91,11 @@ void Scanner::number() {
 
 void Scanner::identifier() {
     while (::isalpha(peek()) || ::isdigit(peek()) || peek() == '_') advance();
-    addToken(IDENTIFIER);
+
+    std::string text = source_.substr(start_, current_ - start_);
+    TokenType type = keywords[text];
+    if (type == 0) type = IDENTIFIER;
+    addToken(type);
 }
 
 void Scanner::scan_token() {
