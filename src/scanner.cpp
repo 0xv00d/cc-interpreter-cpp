@@ -1,6 +1,8 @@
 #include "scanner.hpp"
 #include "errors.hpp"
 
+#include <cctype>
+
 namespace lox {
 std::map<TokenType, std::string> token_string = {
     {TokenType::LEFT_PAREN, "LEFT_PAREN"}, {TokenType::RIGHT_PAREN, "RIGHT_PAREN"},
@@ -46,6 +48,11 @@ char Scanner::peek() {
     return source_.at(current_);
 }
 
+char Scanner::peek_next() {
+    if (current_ + 1 >= source_.size()) return '\0';
+    return source_.at(current_ + 1);
+}
+
 void Scanner::string() {
     while (peek() != '"' && !is_end()) {
       if (peek() == '\n') line_++;
@@ -61,6 +68,16 @@ void Scanner::string() {
 
     std::string value = source_.substr(start_ + 1, current_ - start_ - 2); // Trim
     addToken(TokenType::STRING, value);
+}
+
+void Scanner::number() {
+    while (::isdigit(peek())) advance();
+    if (peek() == '.' && ::isdigit(peek_next())) {
+        advance();
+        while (::isdigit(peek())) advance();
+    }
+
+    addToken(NUMBER, std::stod(source_.substr(start_, current_ - start_)));
 }
 
 void Scanner::scan_token() {
@@ -101,6 +118,8 @@ void Scanner::scan_token() {
             break;
         case '"': string(); break;
         default:
+            if (::isdigit(c)) { number(); break; }
+
             std::ostringstream ss;
             ss << "Unexpected character: " << c;
             error(line_, ss.str());

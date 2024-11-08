@@ -38,6 +38,7 @@ struct Token {
 
     std::string from_literal() {
         if (literal.type().name() == typeid(std::string).name()) return std::any_cast<std::string>(literal);
+        if (literal.type().name() == typeid(double).name()) return std::to_string(std::any_cast<double>(literal));
         if (literal.type().name() == typeid(std::nullptr_t).name()) return "null";
         return "?";
     }
@@ -71,8 +72,10 @@ private:
 
     bool match(char);
     char peek();
+    char peek_next();
 
     void string();
+    void number();
 
     inline char advance() { return source_.at(current_++); }
     inline bool  is_end() { return current_ >= source_.size(); }
