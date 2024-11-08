@@ -83,7 +83,7 @@ void Scanner::scan_token() {
             line_++;
             break;
         default:
-            error(line_, "Unexpected character.");
+            error(line_, "Unexpected character: " + c);
             break;
     }
 }
