@@ -36,9 +36,16 @@ struct Token {
     const std::any literal;
     const int line;
 
+    std::string trimmed_double(double value) {
+        std::string vs = std::to_string(value);
+        vs.erase(vs.find_last_not_of('0') + 1, std::string::npos);
+        if (vs.back() == '.') vs.push_back('0');
+        return vs;
+    }
+
     std::string from_literal() {
         if (literal.type().name() == typeid(std::string).name()) return std::any_cast<std::string>(literal);
-        if (literal.type().name() == typeid(double).name()) return std::to_string(std::any_cast<double>(literal));
+        if (literal.type().name() == typeid(double).name()) return trimmed_double(std::any_cast<double>(literal));
         if (literal.type().name() == typeid(std::nullptr_t).name()) return "null";
         return "?";
     }
