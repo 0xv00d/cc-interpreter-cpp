@@ -1,5 +1,6 @@
 #pragma once
 
+#include <any>
 #include <string>
 #include <sstream>
 #include <map>
@@ -32,15 +33,20 @@ extern std::map<TokenType, std::string> token_string;
 struct Token {
     const TokenType type;
     const std::string lexeme;
-    const void* literal;
+    const std::any literal;
     const int line;
+
+    std::string from_literal() {
+        if (literal.type().name() == typeid(std::string).name()) return std::any_cast<std::string>(literal);
+        if (literal.type().name() == typeid(std::nullptr_t).name()) return "null";
+        return "?";
+    }
 
     std::string to_string() {
         std::ostringstream out;
         out << token_string[type] << " "
             << lexeme << " "
-            << "null";
-            //<< literal;
+            << from_literal();
         return out.str();
     }
 };
@@ -61,10 +67,12 @@ private:
     void scan_token();
 
     inline void addToken(TokenType type) { addToken(type, nullptr); }
-           void addToken(TokenType, void*);
+           void addToken(TokenType, std::any);
 
     bool match(char);
     char peek();
+
+    void string();
 
     inline char advance() { return source_.at(current_++); }
     inline bool  is_end() { return current_ >= source_.size(); }

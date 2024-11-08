@@ -58,3 +58,5 @@ vcpkg_installed
 .vscode
 codecraf.*
 *.exe.metagen
+
+test.lox

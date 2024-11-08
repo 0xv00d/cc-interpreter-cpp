@@ -28,7 +28,7 @@ std::map<TokenType, std::string> token_string = {
     {TokenType::tk_EOF, "EOF"}
 };
 
-void Scanner::addToken(TokenType type, void* literal) {
+void Scanner::addToken(TokenType type, std::any literal) {
     std::string text = source_.substr(start_, current_ - start_);
     tokens_.emplace_back(Token{type, text, literal, line_});
 }
@@ -44,6 +44,23 @@ bool Scanner::match(char expected) {
 char Scanner::peek() {
     if (is_end()) return '\0';
     return source_.at(current_);
+}
+
+void Scanner::string() {
+    while (peek() != '"' && !is_end()) {
+      if (peek() == '\n') line_++;
+      advance();
+    }
+
+    if (is_end()) {
+      error(line_, "Unterminated string.");
+      return;
+    }
+
+    advance(); // Close string
+
+    std::string value = source_.substr(start_ + 1, current_ - start_ - 2); // Trim
+    addToken(TokenType::STRING, value);
 }
 
 void Scanner::scan_token() {
@@ -82,6 +99,7 @@ void Scanner::scan_token() {
         case '\n':
             line_++;
             break;
+        case '"': string(); break;
         default:
             std::ostringstream ss;
             ss << "Unexpected character: " << c;
