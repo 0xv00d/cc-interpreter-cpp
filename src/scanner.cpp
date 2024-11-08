@@ -81,7 +81,7 @@ void Scanner::number() {
 }
 
 void Scanner::identifier() {
-    while (::isalpha(peek()) || peek() == '_') advance();
+    while (::isalpha(peek()) || ::isdigit(peek()) || peek() == '_') advance();
     addToken(IDENTIFIER);
 }
 
