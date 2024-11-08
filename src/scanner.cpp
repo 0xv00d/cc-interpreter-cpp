@@ -83,7 +83,9 @@ void Scanner::scan_token() {
             line_++;
             break;
         default:
-            error(line_, "Unexpected character: " + c);
+            std::ostringstream ss;
+            ss << "Unexpected character: " << c;
+            error(line_, ss.str());
             break;
     }
 }
