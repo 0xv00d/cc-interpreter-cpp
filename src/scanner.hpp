@@ -31,11 +31,7 @@ enum TokenType {
 extern std::map<TokenType, std::string> token_string;
 
 struct Token {
-    const TokenType type;
-    const std::string lexeme;
-    const std::any literal;
-    const int line;
-
+private:
     std::string trimmed_double(double value) {
         std::string vs = std::to_string(value);
         vs.erase(vs.find_last_not_of('0') + 1, std::string::npos);
@@ -49,6 +45,12 @@ struct Token {
         if (literal.type().name() == typeid(std::nullptr_t).name()) return "null";
         return "?";
     }
+
+public:
+    const TokenType type;
+    const std::string lexeme;
+    const std::any literal;
+    const int line;
 
     std::string to_string() {
         std::ostringstream out;
@@ -81,8 +83,9 @@ private:
     char peek();
     char peek_next();
 
-    void string();
-    void number();
+    void     string();
+    void     number();
+    void identifier();
 
     inline char advance() { return source_.at(current_++); }
     inline bool  is_end() { return current_ >= source_.size(); }

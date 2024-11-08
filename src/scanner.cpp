@@ -5,29 +5,29 @@
 
 namespace lox {
 std::map<TokenType, std::string> token_string = {
-    {TokenType::LEFT_PAREN, "LEFT_PAREN"}, {TokenType::RIGHT_PAREN, "RIGHT_PAREN"},
-    {TokenType::LEFT_BRACE, "LEFT_BRACE"}, {TokenType::RIGHT_BRACE, "RIGHT_BRACE"},
-    {TokenType::COMMA, "COMMA"}, {TokenType::DOT, "DOT"},
-    {TokenType::MINUS, "MINUS"}, {TokenType::PLUS, "PLUS"},
-    {TokenType::SEMICOLON, "SEMICOLON"}, {TokenType::SLASH, "SLASH"},
-    {TokenType::STAR, "STAR"},
+    {LEFT_PAREN, "LEFT_PAREN"}, {RIGHT_PAREN, "RIGHT_PAREN"},
+    {LEFT_BRACE, "LEFT_BRACE"}, {RIGHT_BRACE, "RIGHT_BRACE"},
+    {COMMA, "COMMA"}, {DOT, "DOT"},
+    {MINUS, "MINUS"}, {PLUS, "PLUS"},
+    {SEMICOLON, "SEMICOLON"}, {SLASH, "SLASH"},
+    {STAR, "STAR"},
 
-    {TokenType::BANG, "BANG"}, {TokenType::BANG_EQUAL, "BANG_EQUAL"},
-    {TokenType::EQUAL, "EQUAL"}, {TokenType::EQUAL_EQUAL, "EQUAL_EQUAL"},
-    {TokenType::GREATER, "GREATER"}, {TokenType::GREATER_EQUAL, "GREATER_EQUAL"},
-    {TokenType::LESS, "LESS"}, {TokenType::LESS_EQUAL, "LESS_EQUAL"},
+    {BANG, "BANG"}, {BANG_EQUAL, "BANG_EQUAL"},
+    {EQUAL, "EQUAL"}, {EQUAL_EQUAL, "EQUAL_EQUAL"},
+    {GREATER, "GREATER"}, {GREATER_EQUAL, "GREATER_EQUAL"},
+    {LESS, "LESS"}, {LESS_EQUAL, "LESS_EQUAL"},
 
-    {TokenType::IDENTIFIER, "IDENTIFIER"}, {TokenType::STRING, "STRING"},
-    {TokenType::NUMBER, "NUMBER"},
+    {IDENTIFIER, "IDENTIFIER"}, {STRING, "STRING"},
+    {NUMBER, "NUMBER"},
 
-    {TokenType::AND, "AND"}, {TokenType::CLASS, "CLASS"}, {TokenType::ELSE, "ELSE"},
-    {TokenType::FALSE, "FALSE"}, {TokenType::FUN, "FUN"}, {TokenType::FOR, "FOR"},
-    {TokenType::IF, "IF"}, {TokenType::NIL, "NIL"}, {TokenType::OR, "OR"},
-    {TokenType::PRINT, "PRINT"}, {TokenType::RETURN, "RETURN"},
-    {TokenType::SUPER, "SUPER"}, {TokenType::THIS, "THIS"},
-    {TokenType::TRUE, "TRUE"}, {TokenType::VAR, "VAR"}, {TokenType::WHILE, "WHILE"},
+    {AND, "AND"}, {CLASS, "CLASS"}, {ELSE, "ELSE"},
+    {FALSE, "FALSE"}, {FUN, "FUN"}, {FOR, "FOR"},
+    {IF, "IF"}, {NIL, "NIL"}, {OR, "OR"},
+    {PRINT, "PRINT"}, {RETURN, "RETURN"},
+    {SUPER, "SUPER"}, {THIS, "THIS"},
+    {TRUE, "TRUE"}, {VAR, "VAR"}, {WHILE, "WHILE"},
 
-    {TokenType::tk_EOF, "EOF"}
+    {tk_EOF, "EOF"}
 };
 
 void Scanner::addToken(TokenType type, std::any literal) {
@@ -67,7 +67,7 @@ void Scanner::string() {
     advance(); // Close string
 
     std::string value = source_.substr(start_ + 1, current_ - start_ - 2); // Trim
-    addToken(TokenType::STRING, value);
+    addToken(STRING, value);
 }
 
 void Scanner::number() {
@@ -80,30 +80,35 @@ void Scanner::number() {
     addToken(NUMBER, std::stod(source_.substr(start_, current_ - start_)));
 }
 
+void Scanner::identifier() {
+    while (::isalpha(peek()) || peek() == '_') advance();
+    addToken(IDENTIFIER);
+}
+
 void Scanner::scan_token() {
     char c = advance();
     switch (c) {
-        case '(': addToken(TokenType::LEFT_PAREN); break;
-        case ')': addToken(TokenType::RIGHT_PAREN); break;
-        case '{': addToken(TokenType::LEFT_BRACE); break;
-        case '}': addToken(TokenType::RIGHT_BRACE); break;
-        case ',': addToken(TokenType::COMMA); break;
-        case '.': addToken(TokenType::DOT); break;
-        case '-': addToken(TokenType::MINUS); break;
-        case '+': addToken(TokenType::PLUS); break;
-        case ';': addToken(TokenType::SEMICOLON); break;
-        case '*': addToken(TokenType::STAR); break;
+        case '(': addToken(LEFT_PAREN); break;
+        case ')': addToken(RIGHT_PAREN); break;
+        case '{': addToken(LEFT_BRACE); break;
+        case '}': addToken(RIGHT_BRACE); break;
+        case ',': addToken(COMMA); break;
+        case '.': addToken(DOT); break;
+        case '-': addToken(MINUS); break;
+        case '+': addToken(PLUS); break;
+        case ';': addToken(SEMICOLON); break;
+        case '*': addToken(STAR); break;
         case '!':
-            addToken(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG);
+            addToken(match('=') ? BANG_EQUAL : BANG);
             break;
         case '=':
-            addToken(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL);
+            addToken(match('=') ? EQUAL_EQUAL : EQUAL);
             break;
         case '<':
-            addToken(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS);
+            addToken(match('=') ? LESS_EQUAL : LESS);
             break;
         case '>':
-            addToken(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
+            addToken(match('=') ? GREATER_EQUAL : GREATER);
             break;
         case '/':
             if (match('/')) while (peek() != '\n' && !is_end()) advance();
@@ -119,6 +124,7 @@ void Scanner::scan_token() {
         case '"': string(); break;
         default:
             if (::isdigit(c)) { number(); break; }
+            if (::isalpha(c) || c == '_') { identifier(); break; }
 
             std::ostringstream ss;
             ss << "Unexpected character: " << c;
@@ -133,7 +139,7 @@ std::vector<Token> Scanner::scan_tokens() {
         scan_token();
     }
 
-    tokens_.emplace_back(Token{TokenType::tk_EOF, "", nullptr, line_});
+    tokens_.emplace_back(Token{tk_EOF, "", nullptr, line_});
     return tokens_;
 }
 
