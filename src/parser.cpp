@@ -46,41 +46,41 @@ Token Parser::consume(TokenType type, std::string message) {
     throw error(peek(), message);
 }
 
-Expr Parser::primary() {
-    if (match({FALSE})) return Literal{.value = false};
-    if (match({ TRUE})) return Literal{.value = true};
-    if (match({  NIL})) return Literal{.value = NULL};
+Expr* Parser::primary() {
+    if (match({FALSE})) return new Literal(false);
+    if (match({ TRUE})) return new Literal(true);
+    if (match({  NIL})) return new Literal(NULL);
 
     if (match({NUMBER, STRING})) {
-        return Literal{.value = previous().literal};
+        return new Literal(previous().literal);
     }
 
     if (match({LEFT_PAREN})) {
-        Expr expr = expression();
+        Expr* expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression.");
-        return Grouping{expr};
+        return new Grouping(expr);
     }
 
     throw error(peek(), "Expect expression.");
 }
 
-Expr Parser::unary() {
+Expr* Parser::unary() {
     if (match({BANG, MINUS})) {
         Token op = previous();
-        Expr right = unary();
-        return Unary{.op = op, .right = right};
+        Expr* right = unary();
+        return new Unary(op, right);
     }
 
     return primary();
 }
 
-Expr Parser::construct_binary(std::function<Expr()> func, std::vector<TokenType> tokens) {
-    Expr expr = func();
+Expr* Parser::construct_binary(std::function<Expr*()> func, std::vector<TokenType> tokens) {
+    Expr* expr = func();
 
     while (match(tokens)) {
         Token op = previous();
-        Expr right = func();
-        expr = Binary{.left = expr, .op = op, .right = right};
+        Expr* right = func();
+        expr = new Binary(expr, op, right);
     }
 
     return expr;

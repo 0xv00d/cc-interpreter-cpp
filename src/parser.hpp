@@ -16,7 +16,7 @@ private:
 class Parser {
 public:
     Parser(std::vector<Token> tokens): tokens_(tokens) {}
-    inline Expr parse() {
+    inline Expr* parse() {
         try { return expression(); }
         catch (ParseError error) { throw error; }
     }
@@ -39,14 +39,14 @@ private:
 
     Token consume(TokenType, std::string);
 
-    Expr construct_binary(std::function<Expr()>, std::vector<TokenType>);
+    Expr* construct_binary(std::function<Expr*()>, std::vector<TokenType>);
 
-           Expr    primary();
-           Expr      unary();
-    inline Expr     factor() { return construct_binary(std::bind(&Parser::unary,      this), {SLASH, STAR}); }
-    inline Expr       term() { return construct_binary(std::bind(&Parser::factor,     this), {MINUS, PLUS}); }
-    inline Expr comparison() { return construct_binary(std::bind(&Parser::term,       this), {GREATER, GREATER_EQUAL, LESS, LESS_EQUAL}); }
-    inline Expr   equality() { return construct_binary(std::bind(&Parser::comparison, this), {BANG_EQUAL, EQUAL_EQUAL}); }
-    inline Expr expression() { return equality(); }
+           Expr*    primary();
+           Expr*      unary();
+    inline Expr*     factor() { return construct_binary(std::bind(&Parser::unary,      this), {SLASH, STAR}); }
+    inline Expr*       term() { return construct_binary(std::bind(&Parser::factor,     this), {MINUS, PLUS}); }
+    inline Expr* comparison() { return construct_binary(std::bind(&Parser::term,       this), {GREATER, GREATER_EQUAL, LESS, LESS_EQUAL}); }
+    inline Expr*   equality() { return construct_binary(std::bind(&Parser::comparison, this), {BANG_EQUAL, EQUAL_EQUAL}); }
+    inline Expr* expression() { return equality(); }
 };
 } // namespace lox
