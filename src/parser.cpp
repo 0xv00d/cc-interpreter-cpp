@@ -49,7 +49,7 @@ Token Parser::consume(TokenType type, std::string message) {
 Expr* Parser::primary() {
     if (match({FALSE})) return new Literal(false);
     if (match({ TRUE})) return new Literal(true);
-    if (match({  NIL})) return new Literal(NULL);
+    if (match({  NIL})) return new Literal(nullptr);
 
     if (match({NUMBER, STRING})) {
         return new Literal(previous().literal);
