@@ -68,6 +68,7 @@ public:
         if (IS_TYPE(expr->value_, std::nullptr_t)) return "nil";
         if (IS_TYPE(expr->value_, std::string)) return std::any_cast<std::string>(expr->value_);
         if (IS_TYPE(expr->value_, double)) return trimmed_double(std::any_cast<double>(expr->value_));
+        if (IS_TYPE(expr->value_, bool)) return std::any_cast<bool>(expr->value_) ? "true" : "false";
         return "?";
     }
   
