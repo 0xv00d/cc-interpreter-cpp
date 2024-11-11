@@ -162,7 +162,7 @@ std::vector<Token> Scanner::scan_tokens() {
     tokens_.emplace_back(Token{
         .type    = tk_EOF, 
         .lexeme  = "", 
-        .literal = NULL, 
+        .literal = nullptr, 
         .line    = line_
     });
     return tokens_;

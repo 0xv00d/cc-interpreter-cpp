@@ -41,7 +41,7 @@ private:
         if (IS_TYPE(literal, std::string)) return std::any_cast<std::string>(literal);
         if (IS_TYPE(literal, double)) return trimmed_double(std::any_cast<double>(literal));
         if (IS_TYPE(literal, std::nullptr_t)) return "null";
-        return "null";
+        return "?";
     }
 
 public:
@@ -75,7 +75,7 @@ private:
     void scan_token();
 
            void addToken(TokenType, std::any);
-    inline void addToken(TokenType type) { addToken(type, NULL); }
+    inline void addToken(TokenType type) { addToken(type, nullptr); }
 
     bool match(char);
     char peek();

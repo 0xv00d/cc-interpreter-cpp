@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
         auto parser = lox::Parser(tokens);
         auto statement = parser.parse();
 
-        // if (statement == nullptr) return 65;
+        if (statement == nullptr) return 65;
         
         auto printer = lox::ASTPrinter();
         std::cout << printer.print(statement) << std::endl;

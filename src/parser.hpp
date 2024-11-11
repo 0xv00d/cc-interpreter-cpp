@@ -18,7 +18,7 @@ public:
     Parser(std::vector<Token> tokens): tokens_(tokens) {}
     inline Expr* parse() {
         try { return expression(); }
-        catch (ParseError error) { throw error; }
+        catch (ParseError error) { return nullptr; }
     }
 
 private:
