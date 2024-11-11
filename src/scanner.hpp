@@ -6,6 +6,8 @@
 #include <map>
 #include <vector>
 
+#define IS_TYPE(arg, target) arg.type().name() == typeid(target).name()
+
 namespace lox {
 enum TokenType {
      // Single-character tokens.
@@ -31,19 +33,14 @@ enum TokenType {
 extern std::map<TokenType, std::string> token_string;
 extern std::map<std::string, TokenType> keywords;
 
+extern std::string trimmed_double(double);
+
 struct Token {
 private:
-    std::string trimmed_double(double value) {
-        std::string vs = std::to_string(value);
-        vs.erase(vs.find_last_not_of('0') + 1, std::string::npos);
-        if (vs.back() == '.') vs.push_back('0');
-        return vs;
-    }
-
     std::string from_literal() {
-        if (literal.type().name() == typeid(std::string).name()) return std::any_cast<std::string>(literal);
-        if (literal.type().name() == typeid(double).name()) return trimmed_double(std::any_cast<double>(literal));
-        if (literal.type().name() == typeid(std::nullptr_t).name()) return "null";
+        if (IS_TYPE(literal, std::string)) return std::any_cast<std::string>(literal);
+        if (IS_TYPE(literal, double)) return trimmed_double(std::any_cast<double>(literal));
+        if (IS_TYPE(literal, std::nullptr_t)) return "null";
         return "?";
     }
 
@@ -64,7 +61,7 @@ public:
 
 class Scanner {
 public:
-    Scanner(std::string);
+    Scanner(std::string source): source_(source) {}
 
     std::vector<Token> scan_tokens();
 private:
@@ -77,8 +74,8 @@ private:
 
     void scan_token();
 
-    inline void addToken(TokenType type) { addToken(type, nullptr); }
            void addToken(TokenType, std::any);
+    inline void addToken(TokenType type) { addToken(type, NULL); }
 
     bool match(char);
     char peek();

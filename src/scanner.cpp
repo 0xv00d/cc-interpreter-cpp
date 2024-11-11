@@ -39,6 +39,13 @@ std::map<std::string, TokenType> keywords = {
     {"var", VAR}, {"while", WHILE}
 };
 
+std::string trimmed_double(double value) {
+    std::string vs = std::to_string(value);
+    vs.erase(vs.find_last_not_of('0') + 1, std::string::npos);
+    if (vs.back() == '.') vs.push_back('0');
+    return vs;
+}
+
 void Scanner::addToken(TokenType type, std::any literal) {
     std::string text = source_.substr(start_, current_ - start_);
     tokens_.emplace_back(Token{type, text, literal, line_});
@@ -69,7 +76,7 @@ void Scanner::string() {
     }
 
     if (is_end()) {
-      error(line_, "Unterminated string.");
+      err::error(line_, "Unterminated string.");
       return;
     }
 
@@ -141,7 +148,7 @@ void Scanner::scan_token() {
 
             std::ostringstream ss;
             ss << "Unexpected character: " << c;
-            error(line_, ss.str());
+            err::error(line_, ss.str());
             break;
     }
 }
@@ -152,9 +159,12 @@ std::vector<Token> Scanner::scan_tokens() {
         scan_token();
     }
 
-    tokens_.emplace_back(Token{tk_EOF, "", nullptr, line_});
+    tokens_.emplace_back(Token{
+        .type    = tk_EOF, 
+        .lexeme  = "", 
+        .literal = NULL, 
+        .line    = line_
+    });
     return tokens_;
 }
-
-Scanner::Scanner(std::string source): source_(source) {}
 } // namespace lox

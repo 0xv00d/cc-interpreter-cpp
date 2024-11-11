@@ -4,8 +4,9 @@
 
 #include "scanner.hpp"
 #include "errors.hpp"
+#include "parser.hpp"
 
-bool lox::had_error = false;
+bool lox::err::had_error = false;
 
 void run(std::string);
 
@@ -29,13 +30,24 @@ int main(int argc, char *argv[]) {
     if (command == "tokenize") {
         std::string file_contents = read_file_contents(argv[2]);
         
-        lox::Scanner scanner = lox::Scanner(file_contents);
+        auto scanner = lox::Scanner(file_contents);
         auto tokens = scanner.scan_tokens();
         for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
 
-        if (lox::had_error) return 65;
+        if (lox::err::had_error) return 65;
 
-        return 0;
+    } else if (command == "parse") {
+        std::string file_contents = read_file_contents(argv[2]);
+        auto scanner = lox::Scanner(file_contents);
+        auto tokens = scanner.scan_tokens();
+
+        auto parser = lox::Parser(tokens);
+        auto statement = parser.parse();
+
+        // if (statement == nullptr) return 65;
+        
+        auto printer = lox::ASTPrinter();
+        std::cout << printer.print(&statement) << std::endl;
 
     } else {
         std::cerr << "Unknown command: " << command << std::endl;
