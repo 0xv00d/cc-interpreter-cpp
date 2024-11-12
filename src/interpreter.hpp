@@ -35,7 +35,8 @@ public:
                 return std::any_cast<     double>(left) + std::any_cast<     double>(right);
             if ((IS_TYPE(left, std::string)) && (IS_TYPE(right, std::string)))
                 return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
-            throw RuntimeError(expr->op_, "Operands must be two numbers or two strings.");
+            std::string err = "Operands must be two numbers or two strings.";
+            throw RuntimeError(expr->op_, err.data());
         }
 
         if (expr->op_.type == GREATER      ) {
@@ -107,12 +108,14 @@ private:
 
     void assert_number(Token op, std::any operand) {
         if (IS_TYPE(operand, double)) return;
-        throw RuntimeError(op, "Operand must be a number.");
+        std::string err = "Operand must be a number.";
+        throw RuntimeError(op, err.data());
     }
 
     void assert_numbers(Token op, std::any left, std::any right) {
         if (IS_TYPE(left, double) && IS_TYPE(right, double)) return;
-        throw RuntimeError(op, "Operands must be numbers.");
+        std::string err = "Operands must be numbers.";
+        throw RuntimeError(op, err.data());
     }
 
     std::string trimmed_double(double value) {

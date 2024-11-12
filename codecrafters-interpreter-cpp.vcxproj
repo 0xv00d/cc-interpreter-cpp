@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="src\ast.hpp" />
     <ClInclude Include="src\errors.hpp" />
+    <ClInclude Include="src\interpreter.hpp" />
     <ClInclude Include="src\main.hpp" />
     <ClInclude Include="src\parser.hpp" />
     <ClInclude Include="src\scanner.hpp" />
