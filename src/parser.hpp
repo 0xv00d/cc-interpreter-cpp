@@ -19,11 +19,15 @@ class Parser {
 public:
     Parser(std::vector<Token> tokens): tokens_(tokens) {}
     std::vector<Stmt*> parse() {
-        std::vector<Stmt*> statements;
-        while (!is_end()) {
-            statements.emplace_back(statement());
+        try {
+            std::vector<Stmt*> statements;
+            while (!is_end()) {
+                statements.emplace_back(statement());
+            }
+            return statements;
+        } catch (ParseError e) {
+            return {};
         }
-        return statements;
     }
 
 private:
