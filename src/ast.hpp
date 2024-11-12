@@ -10,6 +10,7 @@ struct Binary;
 struct Grouping;
 struct Literal;
 struct Unary;
+struct Variable;
 
 template <typename T>
 class ExprVisitor {
@@ -18,6 +19,7 @@ public:
     virtual T visit_grouping_expr(Grouping*) = 0;
     virtual T visit_literal_expr(Literal*) = 0;
     virtual T visit_unary_expr(Unary*) = 0;
+    virtual T visit_variable_expr(Variable*) = 0;
 };
 
 struct Expr {
@@ -59,15 +61,25 @@ struct Unary: public Expr {
     std::string accept(ExprVisitor<std::string>* visitor) override { return visitor->visit_unary_expr(this); }
     std::any    accept(ExprVisitor<std::any   >* visitor) override { return visitor->visit_unary_expr(this); }
 };
+struct Variable: public Expr {
+    Variable(Token name): name_(name) {}
+
+    Token name_;
+
+    std::string accept(ExprVisitor<std::string>* visitor) override { return visitor->visit_variable_expr(this); }
+    std::any    accept(ExprVisitor<std::any   >* visitor) override { return visitor->visit_variable_expr(this); }
+};
 
 struct Expression;
 struct Print;
+struct Var;
 
 template <typename T>
 class StmtVisitor {
 public:
     virtual T visit_expression_stmt(Expression*) = 0;
     virtual T visit_print_stmt(Print*) = 0;
+    virtual T visit_var_stmt(Var*) = 0;
 };
 
 struct Stmt {
@@ -86,6 +98,14 @@ struct Print: public Stmt {
     Expr* expr_;
 
     void accept(StmtVisitor<void>* visitor) override { visitor->visit_print_stmt(this); }
+};
+struct Var: public Stmt {
+    Var(Token name, Expr* initializer): name_(name), initializer_(initializer) {}
+
+    Token name_;
+    Expr* initializer_;
+
+    void accept(StmtVisitor<void>* visitor) override { visitor->visit_var_stmt(this); }
 };
 
 class ASTPrinter: public ExprVisitor<std::string> {

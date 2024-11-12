@@ -55,6 +55,10 @@ Expr* Parser::primary() {
         return new Literal(previous().literal);
     }
 
+    if (match({IDENTIFIER})) {
+      return new Variable(previous());
+    }
+
     if (match({LEFT_PAREN})) {
         Expr* expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -90,6 +94,26 @@ Stmt* Parser::expression_statement() {
     Expr* expr = expression();
     consume(SEMICOLON, "Expect ';' after expression.");
     return new Expression(expr);
+}
+
+Stmt* Parser::declaration() {
+    try {
+      if (match({VAR})) return var_declaration();
+      return statement();
+    } catch (ParseError error) {
+      synchronize();
+      return nullptr;
+    }
+}
+
+Stmt* Parser::var_declaration() {
+    Token name = consume(IDENTIFIER, "Expect variable name.");
+
+    Expr* initializer = nullptr;
+    if (match({EQUAL})) initializer = expression();
+
+    consume(SEMICOLON, "Expect ';' after variable declaration.");
+    return new Var(name, initializer);
 }
 
 Stmt* Parser::print_statement() {

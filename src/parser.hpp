@@ -22,7 +22,7 @@ public:
         try {
             std::vector<Stmt*> statements;
             while (!is_end()) {
-                statements.emplace_back(statement());
+                statements.emplace_back(declaration());
             }
             return statements;
         } catch (ParseError e) {
@@ -68,5 +68,7 @@ private:
         if (match({PRINT})) return print_statement();
         return expression_statement();
     }
+           Stmt*      declaration();
+           Stmt*  var_declaration();
 };
 } // namespace lox
