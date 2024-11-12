@@ -2,11 +2,11 @@
 #include <fstream>
 #include <iostream>
 
-#include "scanner.hpp"
-#include "errors.hpp"
 #include "parser.hpp"
+#include "interpreter.hpp"
 
 bool lox::err::had_error = false;
+bool lox::err::hadRuntimeError = false;
 
 void run(std::string);
 
@@ -52,6 +52,24 @@ int main(int argc, char *argv[]) {
         
         auto printer = lox::ASTPrinter();
         std::cout << printer.print(statement) << std::endl;
+
+    } else if (command == "evaluate") {
+        std::string file_contents = read_file_contents(argv[2]);
+
+        auto scanner = lox::Scanner(file_contents);
+        auto tokens = scanner.scan_tokens();
+
+        if (lox::err::had_error) return 65;
+
+        auto parser = lox::Parser(tokens);
+        auto statement = parser.parse();
+
+        if (statement == nullptr) return 65;
+
+        auto interpreter = lox::Interpreter();
+        interpreter.interpret(statement);
+
+        if (lox::err::hadRuntimeError) return 70;
 
     } else {
         std::cerr << "Unknown command: " << command << std::endl;

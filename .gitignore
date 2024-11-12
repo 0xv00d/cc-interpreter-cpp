@@ -60,3 +60,8 @@ codecraf.*
 *.exe.metagen
 
 *.lox
+
+Makefile
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
