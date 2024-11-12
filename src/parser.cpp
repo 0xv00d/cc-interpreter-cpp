@@ -85,4 +85,16 @@ Expr* Parser::construct_binary(std::function<Expr*()> func, std::vector<TokenTyp
 
     return expr;
 }
+
+Stmt* Parser::expression_statement() {
+    Expr* expr = expression();
+    consume(SEMICOLON, "Expect ';' after expression.");
+    return new Expression(expr);
+}
+
+Stmt* Parser::print_statement() {
+    Expr* value = expression();
+    consume(SEMICOLON, "Expect ';' after value.");
+    return new Print(value);
+}
 } // namespace lox

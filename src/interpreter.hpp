@@ -4,18 +4,17 @@
 #include "errors.hpp"
 
 namespace lox {
-class Interpreter: public Visitor<std::any> {
+class Interpreter: public ExprVisitor<std::any>, public StmtVisitor<void> {
 public:
-    void interpret(Expr* expr) { 
+    void interpret(std::vector<Stmt*> stmts) { 
         try {
-            std::any value = evaluate(expr);
-            std::cout << stringify(value) << std::endl;
+            for (auto stmt: stmts) execute(stmt);
         } catch (RuntimeError error) {
             err::runtimeError(error);
         }
     }
 
-    std::any visitBinaryExpr(Binary* expr) override {
+    std::any visit_binary_expr(Binary* expr) override {
         std::any  left = evaluate(expr-> left_);
         std::any right = evaluate(expr->right_);
 
@@ -61,11 +60,11 @@ public:
         return nullptr;
     }
   
-    std::any visitGroupingExpr(Grouping* expr) override { return evaluate(expr->expr_); }
+    inline std::any visit_grouping_expr(Grouping* expr) override { return evaluate(expr->expr_); }
   
-    std::any visitLiteralExpr(Literal* expr) override { return expr->value_; }
+    inline std::any visit_literal_expr(Literal* expr) override { return expr->value_; }
   
-    std::any visitUnaryExpr(Unary* expr) override {
+    std::any visit_unary_expr(Unary* expr) override {
         std::any right = evaluate(expr->right_);
 
         if (expr->op_.type == MINUS) {
@@ -76,8 +75,18 @@ public:
         return nullptr;
     }
 
+    inline void visit_expression_stmt(Expression* stmt) override {
+        evaluate(stmt->expr_);
+    }
+
+    void visit_print_stmt(Print* stmt) override {
+        std::any value = evaluate(stmt->expr_);
+        std::cout << stringify(value) << std::endl;
+    }
+
 private:
     std::any evaluate(Expr* expr) { return expr->accept(this); }
+    void      execute(Stmt* stmt) {        stmt->accept(this); }
 
     bool is_truthy(std::any value) {
         if (IS_TYPE(value, std::nullptr_t)) return false;

@@ -18,9 +18,11 @@ private:
 class Parser {
 public:
     Parser(std::vector<Token> tokens): tokens_(tokens) {}
-    inline Expr* parse() {
-        try { return expression(); }
-        catch (ParseError error) { return nullptr; }
+    std::vector<Stmt*> parse() {
+        std::vector<Stmt*> statements;
+        while (!is_end()) {
+            statements.emplace_back(statement());
+        }
     }
 
 private:
@@ -50,5 +52,12 @@ private:
     inline Expr* comparison() { return construct_binary(std::bind(&Parser::term,       this), {GREATER, GREATER_EQUAL, LESS, LESS_EQUAL}); }
     inline Expr*   equality() { return construct_binary(std::bind(&Parser::comparison, this), {BANG_EQUAL, EQUAL_EQUAL}); }
     inline Expr* expression() { return equality(); }
+
+           Stmt* expression_statement();
+           Stmt*      print_statement();
+    inline Stmt*            statement() {
+        if (match({PRINT})) return print_statement();
+        return expression_statement();
+    }
 };
 } // namespace lox
