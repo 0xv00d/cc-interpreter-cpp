@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     if (argc == 1) return repl();
 
     if (argc < 3) {
-        std::cerr << "Usage: ./your_program tokenize <filename>" << std::endl;
+        std::cerr << "Usage: ./your_program <command> <filename>" << std::endl;
         return 1;
     }
 
@@ -32,14 +32,18 @@ int main(int argc, char *argv[]) {
         
         auto scanner = lox::Scanner(file_contents);
         auto tokens = scanner.scan_tokens();
-        for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
 
         if (lox::err::had_error) return 65;
 
+        for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
+
     } else if (command == "parse") {
         std::string file_contents = read_file_contents(argv[2]);
+
         auto scanner = lox::Scanner(file_contents);
         auto tokens = scanner.scan_tokens();
+
+        if (lox::err::had_error) return 65;
 
         auto parser = lox::Parser(tokens);
         auto statement = parser.parse();

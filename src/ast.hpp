@@ -9,16 +9,18 @@ struct Grouping;
 struct Literal;
 struct Unary;
 
+template <typename T>
 class Visitor {
 public:
-    virtual std::string visitBinaryExpr(Binary*) = 0;
-    virtual std::string visitGroupingExpr(Grouping*) = 0;
-    virtual std::string visitLiteralExpr(Literal*) = 0;
-    virtual std::string visitUnaryExpr(Unary*) = 0;
+    virtual T visitBinaryExpr(Binary*) = 0;
+    virtual T visitGroupingExpr(Grouping*) = 0;
+    virtual T visitLiteralExpr(Literal*) = 0;
+    virtual T visitUnaryExpr(Unary*) = 0;
 };
 
 struct Expr {
-    virtual std::string accept(Visitor*) = 0;
+    virtual std::string accept(Visitor<std::string>*) = 0;
+    virtual std::any    accept(Visitor<std::any   >*) = 0;
 };
 struct Binary: public Expr {
     Binary(Expr* left, Token op, Expr* right): left_(left), op_(op), right_(right) {}
@@ -27,21 +29,24 @@ struct Binary: public Expr {
     Token op_;
     Expr* right_;
 
-    std::string accept(Visitor* visitor) override {  return visitor->visitBinaryExpr(this); }
+    std::string accept(Visitor<std::string>* visitor) override { return visitor->visitBinaryExpr(this); }
+    std::any    accept(Visitor<std::any   >* visitor) override { return visitor->visitBinaryExpr(this); }
 };
 struct Grouping: public Expr {
     Grouping(Expr* expr): expr_(expr) {}
 
     Expr* expr_;
 
-    std::string accept(Visitor* visitor) override { return visitor->visitGroupingExpr(this); }
+    std::string accept(Visitor<std::string>* visitor) override { return visitor->visitGroupingExpr(this); }
+    std::any    accept(Visitor<std::any   >* visitor) override { return visitor->visitGroupingExpr(this); }
 };
 struct Literal: public Expr {
     Literal(std::any value): value_(value) {}
 
     std::any value_;
 
-    std::string accept(Visitor* visitor) override { return visitor->visitLiteralExpr(this); }
+    std::string accept(Visitor<std::string>* visitor) override { return visitor->visitLiteralExpr(this); }
+    std::any    accept(Visitor<std::any   >* visitor) override { return visitor->visitLiteralExpr(this); }
 };
 struct Unary: public Expr {
     Unary(Token op, Expr* right): op_(op), right_(right) {}
@@ -49,10 +54,11 @@ struct Unary: public Expr {
     Token op_;
     Expr* right_;
 
-    std::string accept(Visitor* visitor) override { return visitor->visitUnaryExpr(this); }
+    std::string accept(Visitor<std::string>* visitor) override { return visitor->visitUnaryExpr(this); }
+    std::any    accept(Visitor<std::any   >* visitor) override { return visitor->visitUnaryExpr(this); }
 };
 
-class ASTPrinter: public Visitor {
+class ASTPrinter: public Visitor<std::string> {
 public:
     std::string print(Expr* expr) { return expr->accept(this); }
 
