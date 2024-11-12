@@ -106,6 +106,13 @@ private:
         throw RuntimeError(op, "Operands must be numbers.");
     }
 
+    std::string trimmed_double(double value) {
+        std::string vs = std::to_string(value);
+        vs.erase(vs.find_last_not_of('0') + 1, std::string::npos);
+        if (vs.back() == '.') vs.pop_back();
+        return vs;
+    }
+
     std::string stringify(std::any value) {
         if (IS_TYPE(value, std::nullptr_t)) return "nil";
         if (IS_TYPE(value, std::string)) return std::any_cast<std::string>(value);
