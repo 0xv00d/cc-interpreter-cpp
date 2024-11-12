@@ -33,9 +33,9 @@ int main(int argc, char *argv[]) {
         auto scanner = lox::Scanner(file_contents);
         auto tokens = scanner.scan_tokens();
 
-        if (lox::err::had_error) return 65;
-
         for (lox::Token token: tokens) std::cout << token.to_string() << std::endl;
+
+        if (lox::err::had_error) return 65;
 
     } else if (command == "parse") {
         std::string file_contents = read_file_contents(argv[2]);
