@@ -29,6 +29,10 @@ public:
             return {};
         }
     }
+    inline Expr* parse(int i) {
+        try { return expression(); }
+        catch (ParseError error) { return nullptr; }
+    }
 
 private:
     std::vector<Token> tokens_;

@@ -14,6 +14,15 @@ public:
         }
     }
 
+    void interpret(Expr* expr) { 
+        try {
+            std::any value = evaluate(expr);
+            std::cout << stringify(value) << std::endl;
+        } catch (RuntimeError error) {
+            err::runtimeError(error);
+        }
+    }
+
     std::any visit_binary_expr(Binary* expr) override {
         std::any  left = evaluate(expr-> left_);
         std::any right = evaluate(expr->right_);

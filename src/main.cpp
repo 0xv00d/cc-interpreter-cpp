@@ -46,14 +46,32 @@ int main(int argc, char *argv[]) {
         if (lox::err::had_error) return 65;
 
         auto parser = lox::Parser(tokens);
-        auto statements = parser.parse();
+        auto statement = parser.parse(1);
 
-        if (statements.size() == 0) return 65;
+        if (statement == nullptr) return 65;
         
-        //auto printer = lox::ASTPrinter();
-        //for (auto statement: statements) std::cout << printer.print(statement) << std::endl;
+        auto printer = lox::ASTPrinter();
+        std::cout << printer.print(statement) << std::endl;
 
-    } else if (command == "evaluate" || command == "run") {
+    } else if (command == "evaluate") {
+        std::string file_contents = read_file_contents(argv[2]);
+
+        auto scanner = lox::Scanner(file_contents);
+        auto tokens = scanner.scan_tokens();
+
+        if (lox::err::had_error) return 65;
+
+        auto parser = lox::Parser(tokens);
+        auto statement = parser.parse(1);
+
+        if (statement == nullptr) return 65;
+
+        auto interpreter = lox::Interpreter();
+        interpreter.interpret(statement);
+
+        if (lox::err::hadRuntimeError) return 70;
+
+    } else if (command == "run") {
         std::string file_contents = read_file_contents(argv[2]);
 
         auto scanner = lox::Scanner(file_contents);
