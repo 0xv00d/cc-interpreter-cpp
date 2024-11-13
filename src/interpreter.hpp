@@ -29,6 +29,7 @@ public:
     inline std::any  visit_literal_expr( Literal* expr) override { return expr->value_; }
            std::any    visit_unary_expr(   Unary*     ) override;
     inline std::any visit_variable_expr(Variable* expr) override { return environment_.get(expr->name_); }
+           std::any   visit_assign_expr(  Assign*     ) override;
 
     inline void visit_expression_stmt(Expression* stmt) override { evaluate(stmt->expr_); }
            void      visit_print_stmt(     Print* stmt) override;

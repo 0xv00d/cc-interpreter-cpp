@@ -6,6 +6,7 @@
 #include <iostream>
 
 namespace lox {
+struct Assign;
 struct Binary;
 struct Grouping;
 struct Literal;
@@ -15,6 +16,7 @@ struct Variable;
 template <typename T>
 class ExprVisitor {
 public:
+    virtual T visit_assign_expr(Assign*) = 0;
     virtual T visit_binary_expr(Binary*) = 0;
     virtual T visit_grouping_expr(Grouping*) = 0;
     virtual T visit_literal_expr(Literal*) = 0;
@@ -25,6 +27,15 @@ public:
 struct Expr {
     virtual std::string accept(ExprVisitor<std::string>*) = 0;
     virtual std::any    accept(ExprVisitor<std::any   >*) = 0;
+};
+struct Assign: public Expr {
+    Assign(Token name, Expr* value): name_(name), value_(value) {}
+
+    Token name_;
+    Expr* value_;
+
+    std::string accept(ExprVisitor<std::string>* visitor) override { return visitor->visit_assign_expr(this); }
+    std::any    accept(ExprVisitor<std::any   >* visitor) override { return visitor->visit_assign_expr(this); }
 };
 struct Binary: public Expr {
     Binary(Expr* left, Token op, Expr* right): left_(left), op_(op), right_(right) {}
@@ -115,7 +126,6 @@ public:
     inline std::string visit_binary_expr(Binary* expr) override {
         return parenthesize(expr->op_.lexeme, {expr->left_, expr->right_});
     }
-  
     inline std::string visit_grouping_expr(Grouping* expr) override {
         return parenthesize("group", {expr->expr_});
     }
@@ -133,6 +143,9 @@ public:
     }
     inline std::string visit_variable_expr(Variable* expr) override {
         return expr->name_.lexeme;
+    }
+    inline std::string visit_assign_expr(Assign* expr) override {
+        return parenthesize(expr->name_.lexeme, {expr->value_});
     }
 
 private:

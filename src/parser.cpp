@@ -78,6 +78,24 @@ Expr* Parser::unary() {
     return primary();
 }
 
+Expr* Parser::assignment() {
+    Expr* expr = equality();
+
+    if (match({EQUAL})) {
+        Token equals = previous();
+        Expr* value = assignment();
+
+        if (dynamic_cast<Variable*>(expr) != nullptr) {
+            Token name = ((Variable*)expr)->name_;
+            return new Assign(name, value);
+        }
+        
+        error(equals, "Invalid assignment target."); 
+    }
+
+    return expr;
+}
+
 Expr* Parser::construct_binary(std::function<Expr*()> func, std::vector<TokenType> tokens) {
     Expr* expr = func();
 

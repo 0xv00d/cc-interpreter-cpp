@@ -20,6 +20,16 @@ struct Environment {
         }
         return it->second;
     }
+
+    void assign(Token name, std::any value) {
+        auto it = values_.find(name.lexeme);
+        if (it == values_.end()) {
+            std::string err = "Undefined variable '" + name.lexeme + "'.";
+            throw RuntimeError(name, err.data());
+        }
+        values_[name.lexeme] = value;
+    }
+
 private:
     std::unordered_map<std::string, std::any> values_;
 };

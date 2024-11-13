@@ -59,6 +59,12 @@ std::any Interpreter::visit_unary_expr(Unary* expr) {
     return nullptr;
 }
 
+std::any Interpreter::visit_assign_expr(Assign* expr) {
+    std::any value = evaluate(expr->value_);
+    environment_.assign(expr->name_, value);
+    return value;
+}
+
 void Interpreter::visit_print_stmt(Print* stmt) {
     std::any value = evaluate(stmt->expr_);
     std::cout << stringify(value) << std::endl;
