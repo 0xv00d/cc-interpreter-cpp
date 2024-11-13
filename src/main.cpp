@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
         auto parser = lox::Parser(tokens);
         auto statements = parser.parse();
 
-        if (statements.size() == 0) return 65;
+        if (lox::err::had_error || statements.size() == 0) return 65;
 
         auto interpreter = lox::Interpreter();
         interpreter.interpret(statements);
