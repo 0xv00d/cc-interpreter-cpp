@@ -84,6 +84,7 @@ struct Variable: public Expr {
 struct Expression;
 struct Print;
 struct Var;
+struct Block;
 
 template <typename T>
 class StmtVisitor {
@@ -91,6 +92,7 @@ public:
     virtual T visit_expression_stmt(Expression*) = 0;
     virtual T visit_print_stmt(Print*) = 0;
     virtual T visit_var_stmt(Var*) = 0;
+    virtual T visit_block_stmt(Block*) = 0;
 };
 
 struct Stmt {
@@ -117,6 +119,13 @@ struct Var: public Stmt {
     Expr* initializer_;
 
     void accept(StmtVisitor<void>* visitor) override { visitor->visit_var_stmt(this); }
+};
+struct Block: public Stmt {
+    Block(std::vector<Stmt*> statements): statements_(statements) {}
+
+    std::vector<Stmt*> statements_;
+
+    void accept(StmtVisitor<void>* visitor) override { visitor->visit_block_stmt(this); }
 };
 
 class ASTPrinter: public ExprVisitor<std::string> {

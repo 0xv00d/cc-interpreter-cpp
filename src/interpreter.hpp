@@ -32,14 +32,19 @@ public:
            std::any   visit_assign_expr(  Assign*     ) override;
 
     inline void visit_expression_stmt(Expression* stmt) override { evaluate(stmt->expr_); }
-           void      visit_print_stmt(     Print* stmt) override;
+           void      visit_print_stmt(     Print*     ) override;
            void        visit_var_stmt(       Var*     ) override;
+    inline void      visit_block_stmt(     Block* stmt) override {
+        execute_block(stmt->statements_, new Environment(environment_));
+    }
 
 private:
     Environment environment_ = Environment();
 
     std::any evaluate(Expr* expr) { return expr->accept(this); }
     void      execute(Stmt* stmt) {        stmt->accept(this); }
+
+    void execute_block(std::vector<Stmt*>, Environment*);
 
     bool is_truthy(std::any value) {
         if (IS_TYPE(value, std::nullptr_t)) return false;

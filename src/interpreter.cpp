@@ -76,4 +76,17 @@ void Interpreter::visit_var_stmt(Var* stmt) {
 
     environment_.define(stmt->name_.lexeme, value);
 }
+
+void Interpreter::execute_block(std::vector<Stmt*> statements, Environment* environment) {
+    Environment previous = environment_;
+    environment_ = environment;
+
+    try {
+        for (auto stmt: statements) execute(stmt);
+    } catch (RuntimeError error) {
+        err::runtimeError(error);
+    }
+
+    environment_ = previous;
+}
 } // namespace lox

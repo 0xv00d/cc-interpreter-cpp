@@ -96,6 +96,16 @@ Expr* Parser::assignment() {
     return expr;
 }
 
+std::vector<Stmt*> Parser::block() {
+    std::vector<Stmt*> statements;
+
+    consume(LEFT_BRACE, "Expect '{' before block.");
+    while (!check(RIGHT_BRACE) && !is_end()) statements.emplace_back(declaration());
+    consume(RIGHT_BRACE, "Expect '}' after block.");
+
+    return statements;
+}
+
 Expr* Parser::construct_binary(std::function<Expr*()> func, std::vector<TokenType> tokens) {
     Expr* expr = func();
 
@@ -114,15 +124,13 @@ Stmt* Parser::expression_statement() {
     return new Expression(expr);
 }
 
-Stmt* Parser::declaration() {
-    try {
-      if (match({VAR})) return var_declaration();
-      return statement();
-    } catch (ParseError error) {
-      synchronize();
-      return nullptr;
-    }
-}
+Stmt* Parser::declaration() { try {
+    if (match({VAR})) return var_declaration();
+    return statement();
+} catch (ParseError error) {
+    synchronize();
+    return nullptr;
+}}
 
 Stmt* Parser::var_declaration() {
     Token name = consume(IDENTIFIER, "Expect variable name.");

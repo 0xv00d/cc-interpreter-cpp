@@ -63,13 +63,16 @@ private:
            Expr* assignment();
     inline Expr* expression() { return assignment(); }
 
-           Stmt* expression_statement();
-           Stmt*      print_statement();
-    inline Stmt*            statement() {
+    std::vector<Stmt*> block();
+
+    Stmt* expression_statement();
+    Stmt*      print_statement();
+    Stmt*            statement() {
         if (match({PRINT})) return print_statement();
+        if (match({RIGHT_BRACE})) return new Block(block());
         return expression_statement();
     }
-           Stmt*      declaration();
-           Stmt*  var_declaration();
+    Stmt*      declaration();
+    Stmt*  var_declaration();
 };
 } // namespace lox
