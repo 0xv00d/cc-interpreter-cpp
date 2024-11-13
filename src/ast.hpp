@@ -110,13 +110,13 @@ struct Var: public Stmt {
 
 class ASTPrinter: public ExprVisitor<std::string> {
 public:
-    std::string print(Expr* expr) { return expr->accept(this); }
+    inline std::string print(Expr* expr) { return expr->accept(this); }
 
-    std::string visit_binary_expr(Binary* expr) override {
+    inline std::string visit_binary_expr(Binary* expr) override {
         return parenthesize(expr->op_.lexeme, {expr->left_, expr->right_});
     }
   
-    std::string visit_grouping_expr(Grouping* expr) override {
+    inline std::string visit_grouping_expr(Grouping* expr) override {
         return parenthesize("group", {expr->expr_});
     }
   
@@ -128,8 +128,11 @@ public:
         return "?";
     }
   
-    std::string visit_unary_expr(Unary* expr) override {
+    inline std::string visit_unary_expr(Unary* expr) override {
         return parenthesize(expr->op_.lexeme, {expr->right_});
+    }
+    inline std::string visit_variable_expr(Variable* expr) override {
+        return expr->name_.lexeme;
     }
 
 private:

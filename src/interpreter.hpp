@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ast.hpp"
+#include "environment.hpp"
 #include "errors.hpp"
 
 namespace lox {
@@ -23,78 +24,19 @@ public:
         }
     }
 
-    std::any visit_binary_expr(Binary* expr) override {
-        std::any  left = evaluate(expr-> left_);
-        std::any right = evaluate(expr->right_);
-
-        if (expr->op_.type == MINUS) {
-            assert_numbers(expr->op_, left, right);
-            return std::any_cast<double>(left) - std::any_cast<double>(right);
-        }
-        if (expr->op_.type == SLASH) {
-            assert_numbers(expr->op_, left, right);
-            return std::any_cast<double>(left) / std::any_cast<double>(right);
-        }
-        if (expr->op_.type ==  STAR) {
-            assert_numbers(expr->op_, left, right);
-            return std::any_cast<double>(left) * std::any_cast<double>(right);
-        }
-        if (expr->op_.type ==  PLUS) {
-            if ((IS_TYPE(left,      double)) && (IS_TYPE(right,      double))) 
-                return std::any_cast<     double>(left) + std::any_cast<     double>(right);
-            if ((IS_TYPE(left, std::string)) && (IS_TYPE(right, std::string)))
-                return std::any_cast<std::string>(left) + std::any_cast<std::string>(right);
-            std::string err = "Operands must be two numbers or two strings.";
-            throw RuntimeError(expr->op_, err.data());
-        }
-
-        if (expr->op_.type == GREATER      ) {
-            assert_numbers(expr->op_, left, right);
-            return std::any_cast<double>(left) >  std::any_cast<double>(right);
-        }
-        if (expr->op_.type == GREATER_EQUAL) {
-            assert_numbers(expr->op_, left, right);
-            return std::any_cast<double>(left) >= std::any_cast<double>(right);
-        }
-        if (expr->op_.type ==    LESS      ) {
-            assert_numbers(expr->op_, left, right);
-            return std::any_cast<double>(left) <  std::any_cast<double>(right);
-        }
-        if (expr->op_.type ==    LESS_EQUAL) {
-            assert_numbers(expr->op_, left, right);
-            return std::any_cast<double>(left) <= std::any_cast<double>(right);
-        }
-
-        if (expr->op_.type == EQUAL_EQUAL) return  is_equal(left, right);
-        if (expr->op_.type ==  BANG_EQUAL) return !is_equal(left, right);
-        return nullptr;
-    }
-  
+           std::any   visit_binary_expr( Binary*      ) override;
     inline std::any visit_grouping_expr(Grouping* expr) override { return evaluate(expr->expr_); }
-  
-    inline std::any visit_literal_expr(Literal* expr) override { return expr->value_; }
-  
-    std::any visit_unary_expr(Unary* expr) override {
-        std::any right = evaluate(expr->right_);
+    inline std::any  visit_literal_expr( Literal* expr) override { return expr->value_; }
+           std::any    visit_unary_expr(   Unary*     ) override;
+    inline std::any visit_variable_expr(Variable* expr) override { return environment_.get(expr->name_); }
 
-        if (expr->op_.type == MINUS) {
-            assert_number(expr->op_, right);
-            return -std::any_cast<double>(right);
-        }
-        if (expr->op_.type ==  BANG) return !is_truthy(right);
-        return nullptr;
-    }
-
-    inline void visit_expression_stmt(Expression* stmt) override {
-        evaluate(stmt->expr_);
-    }
-
-    void visit_print_stmt(Print* stmt) override {
-        std::any value = evaluate(stmt->expr_);
-        std::cout << stringify(value) << std::endl;
-    }
+    inline void visit_expression_stmt(Expression* stmt) override { evaluate(stmt->expr_); }
+           void      visit_print_stmt(     Print* stmt) override;
+           void        visit_var_stmt(       Var*     ) override;
 
 private:
+    Environment environment_ = Environment();
+
     std::any evaluate(Expr* expr) { return expr->accept(this); }
     void      execute(Stmt* stmt) {        stmt->accept(this); }
 
