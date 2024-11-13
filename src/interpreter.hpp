@@ -28,7 +28,7 @@ public:
     inline std::any visit_grouping_expr(Grouping* expr) override { return evaluate(expr->expr_); }
     inline std::any  visit_literal_expr( Literal* expr) override { return expr->value_; }
            std::any    visit_unary_expr(   Unary*     ) override;
-    inline std::any visit_variable_expr(Variable* expr) override { return environment_.get(expr->name_); }
+    inline std::any visit_variable_expr(Variable* expr) override { return environment_->get(expr->name_); }
            std::any   visit_assign_expr(  Assign*     ) override;
 
     inline void visit_expression_stmt(Expression* stmt) override { evaluate(stmt->expr_); }
@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    Environment environment_ = Environment();
+    Environment* environment_ = new Environment();
 
     std::any evaluate(Expr* expr) { return expr->accept(this); }
     void      execute(Stmt* stmt) {        stmt->accept(this); }

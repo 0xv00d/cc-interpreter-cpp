@@ -61,7 +61,7 @@ std::any Interpreter::visit_unary_expr(Unary* expr) {
 
 std::any Interpreter::visit_assign_expr(Assign* expr) {
     std::any value = evaluate(expr->value_);
-    environment_.assign(expr->name_, value);
+    environment_->assign(expr->name_, value);
     return value;
 }
 
@@ -74,11 +74,11 @@ void Interpreter::visit_var_stmt(Var* stmt) {
     std::any value = nullptr;
     if (stmt->initializer_ != nullptr) value = evaluate(stmt->initializer_);
 
-    environment_.define(stmt->name_.lexeme, value);
+    environment_->define(stmt->name_.lexeme, value);
 }
 
 void Interpreter::execute_block(std::vector<Stmt*> statements, Environment* environment) {
-    Environment previous = environment_;
+    Environment* previous = environment_;
     environment_ = environment;
 
     try {
