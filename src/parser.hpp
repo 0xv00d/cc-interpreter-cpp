@@ -69,7 +69,7 @@ private:
     Stmt*      print_statement();
     Stmt*            statement() {
         if (match({PRINT})) return print_statement();
-        if (match({RIGHT_BRACE})) return new Block(block());
+        if (match({LEFT_BRACE})) return new Block(block());
         return expression_statement();
     }
     Stmt*      declaration();
