@@ -4,23 +4,23 @@
 #include "errors.hpp"
 
 #include <any>
-#include <unordered_set>
+#include <unordered_map>
 
 namespace lox {
 struct Environment {
-    std::unordered_map<std::string, std::any> values;
-
     void define(const std::string& variable, std::any value) {
-        values[variable] = value;
+        values_[variable] = value;
     }
 
     std::any get(Token name) {
-        auto it = values.find(name.lexeme);
-        if (it == values.end()) {
+        auto it = values_.find(name.lexeme);
+        if (it == values_.end()) {
             std::string err = "Undefined variable '" + name.lexeme + "'.";
             throw RuntimeError(name, err.data());
         }
         return it->second;
     }
+private:
+    std::unordered_map<std::string, std::any> values_;
 };
 } // namespace lox
