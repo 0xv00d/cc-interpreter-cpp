@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scanner.hpp"
+#include "../scanner.hpp"
 
 namespace lox {
 struct Assign;
