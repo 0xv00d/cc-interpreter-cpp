@@ -79,7 +79,7 @@ Expr* Parser::unary() {
 }
 
 Expr* Parser::assignment() {
-    Expr* expr = or();
+    Expr* expr = or_expr();
 
     if (match({EQUAL})) {
         Token equals = previous();
@@ -96,19 +96,19 @@ Expr* Parser::assignment() {
     return expr;
 }
 
-Expr* Parser::or() {
-    Expr* expr = and();
+Expr* Parser::or_expr() {
+    Expr* expr = and_expr();
 
     while (match({OR})) {
         Token op = previous();
-        Expr* right = and();
+        Expr* right = and_expr();
         expr = new Logical(expr, op, right);
     }
 
     return expr;
 }
 
-Expr* Parser::and() {
+Expr* Parser::and_expr() {
     Expr* expr = equality();
 
     while (match({AND})) {
@@ -213,7 +213,7 @@ Stmt* Parser::for_statement() {
 
     if (!condition) condition = new Literal(true);
     body = new While(condition, body);
-    
+
     if (initializer) body = new Block({initializer, body});
     
     return body;

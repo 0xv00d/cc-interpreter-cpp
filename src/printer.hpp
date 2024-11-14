@@ -1,6 +1,6 @@
 #pragma once
 
-#include "expressions.hpp"
+#include "ast/expressions.hpp"
 #include <iostream>
 
 namespace lox {
