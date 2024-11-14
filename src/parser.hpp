@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast.hpp"
+#include "statements.hpp"
 
 #include <functional>
 
@@ -61,14 +61,22 @@ private:
     inline Expr* comparison() { return construct_binary(std::bind(&Parser::term,       this), {GREATER, GREATER_EQUAL, LESS, LESS_EQUAL}); }
     inline Expr*   equality() { return construct_binary(std::bind(&Parser::comparison, this), {BANG_EQUAL, EQUAL_EQUAL}); }
            Expr* assignment();
+           Expr*         or();
+           Expr*        and();
     inline Expr* expression() { return assignment(); }
 
     std::vector<Stmt*> block();
 
     Stmt* expression_statement();
     Stmt*      print_statement();
+    Stmt*        for_statement();
+    Stmt*         if_statement();
+    Stmt*      while_statement();
     Stmt*            statement() {
-        if (match({PRINT})) return print_statement();
+        if (match({       FOR})) return   for_statement();
+        if (match({        IF})) return    if_statement();
+        if (match({     PRINT})) return print_statement();
+        if (match({     WHILE})) return while_statement();
         if (match({LEFT_BRACE})) return new Block(block());
         return expression_statement();
     }

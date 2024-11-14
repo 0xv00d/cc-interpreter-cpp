@@ -22,6 +22,10 @@ public:
         if (IS_TYPE(expr->value_, bool)) return std::any_cast<bool>(expr->value_) ? "true" : "false";
         return "?";
     }
+    
+    inline std::string visit_logical_expr(Logical* expr) override {
+        return parenthesize(expr->op_.lexeme, {expr->left_, expr->right_});
+    }
   
     inline std::string visit_unary_expr(Unary* expr) override {
         return parenthesize(expr->op_.lexeme, {expr->right_});

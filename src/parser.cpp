@@ -79,18 +79,42 @@ Expr* Parser::unary() {
 }
 
 Expr* Parser::assignment() {
-    Expr* expr = equality();
+    Expr* expr = or();
 
     if (match({EQUAL})) {
         Token equals = previous();
         Expr* value = assignment();
 
-        if (dynamic_cast<Variable*>(expr) != nullptr) {
+        if (dynamic_cast<Variable*>(expr)) {
             Token name = ((Variable*)expr)->name_;
             return new Assign(name, value);
         }
         
         error(equals, "Invalid assignment target."); 
+    }
+
+    return expr;
+}
+
+Expr* Parser::or() {
+    Expr* expr = and();
+
+    while (match({OR})) {
+        Token op = previous();
+        Expr* right = and();
+        expr = new Logical(expr, op, right);
+    }
+
+    return expr;
+}
+
+Expr* Parser::and() {
+    Expr* expr = equality();
+
+    while (match({AND})) {
+        Token op = previous();
+        Expr* right = equality();
+        expr = new Logical(expr, op, right);
     }
 
     return expr;
@@ -145,5 +169,53 @@ Stmt* Parser::print_statement() {
     Expr* value = expression();
     consume(SEMICOLON, "Expect ';' after value.");
     return new Print(value);
+}
+
+Stmt* Parser::if_statement() {
+    consume(LEFT_PAREN, "Expect '(' after 'if'.");
+    Expr* condition = expression();
+    consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+    Stmt* then_branch = statement();
+    Stmt* else_branch = nullptr;
+    if (match({ELSE})) else_branch = statement();
+
+    return new If(condition, then_branch, else_branch);
+}
+
+Stmt* Parser::while_statement() {
+    consume(LEFT_PAREN, "Expect '(' after 'while'.");
+    Expr* condition = expression();
+    consume(RIGHT_PAREN, "Expect ')' after while condition.");
+    
+    Stmt* body = statement();
+    return new While(condition, body);
+}
+
+Stmt* Parser::for_statement() {
+    consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+    Stmt* initializer;
+    if      (match({SEMICOLON})) initializer = nullptr;
+    else if (match({VAR      })) initializer = var_declaration();
+    else                         initializer = expression_statement();
+    
+    Expr* condition = nullptr;
+    if (!check({SEMICOLON})) condition = expression();
+    consume(SEMICOLON, "Expect ';' after loop condition.");
+
+    Expr* increment = nullptr;
+    if (!check({RIGHT_PAREN})) increment = expression();
+    consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    Stmt* body = statement();
+    if (increment) body = new Block({body, new Expression(increment)});
+
+    if (!condition) condition = new Literal(true);
+    body = new While(condition, body);
+    
+    if (initializer) body = new Block({initializer, body});
+    
+    return body;
 }
 } // namespace lox

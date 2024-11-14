@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast.hpp"
+#include "statements.hpp"
 #include "environment.hpp"
 #include "errors.hpp"
 
@@ -27,6 +27,7 @@ public:
            std::any   visit_binary_expr( Binary*      ) override;
     inline std::any visit_grouping_expr(Grouping* expr) override { return evaluate(expr->expr_); }
     inline std::any  visit_literal_expr( Literal* expr) override { return expr->value_; }
+           std::any   visit_logical_expr( Logical*    ) override;
            std::any    visit_unary_expr(   Unary*     ) override;
     inline std::any visit_variable_expr(Variable* expr) override { return environment_->get(expr->name_); }
            std::any   visit_assign_expr(  Assign*     ) override;
@@ -36,6 +37,13 @@ public:
            void        visit_var_stmt(       Var*     ) override;
     inline void      visit_block_stmt(     Block* stmt) override {
         execute_block(stmt->statements_, new Environment(environment_));
+    }
+    inline void         visit_if_stmt(        If* stmt) override {
+        if (is_truthy(evaluate(stmt->condition_))) execute(stmt->then_branch_);
+        else               if (stmt->else_branch_) execute(stmt->else_branch_);
+    }
+    inline void      visit_while_stmt(     While* stmt) override {
+        while (is_truthy(evaluate(stmt->condition_))) execute(stmt->body_);
     }
 
 private:

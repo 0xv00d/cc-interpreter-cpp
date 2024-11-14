@@ -1,6 +1,7 @@
 #pragma once
 
-#include "main.hpp"
+#include <string>
+#include <iostream>
 
 namespace lox {
 class RuntimeError: public std::exception {

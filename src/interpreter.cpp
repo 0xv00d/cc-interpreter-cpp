@@ -48,6 +48,15 @@ std::any Interpreter::visit_binary_expr(Binary* expr) {
     return nullptr;
 }
 
+std::any Interpreter::visit_logical_expr(Logical* expr) {
+    std::any left = evaluate(expr->left_);
+    
+    if (expr->op_.type ==  OR) if ( is_truthy(left)) return left;
+    if (expr->op_.type == AND) if (!is_truthy(left)) return left;
+
+    return evaluate(expr->right_);
+}
+
 std::any Interpreter::visit_unary_expr(Unary* expr) {
     std::any right = evaluate(expr->right_);
 
@@ -72,7 +81,7 @@ void Interpreter::visit_print_stmt(Print* stmt) {
 
 void Interpreter::visit_var_stmt(Var* stmt) {
     std::any value = nullptr;
-    if (stmt->initializer_ != nullptr) value = evaluate(stmt->initializer_);
+    if (stmt->initializer_) value = evaluate(stmt->initializer_);
 
     environment_->define(stmt->name_.lexeme, value);
 }

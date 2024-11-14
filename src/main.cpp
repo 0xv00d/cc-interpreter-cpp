@@ -1,7 +1,9 @@
 #include <cstring>
 #include <fstream>
+#include <string>
 #include <iostream>
 
+#include "printer.hpp"
 #include "parser.hpp"
 #include "interpreter.hpp"
 
@@ -48,7 +50,7 @@ int main(int argc, char *argv[]) {
         auto parser = lox::Parser(tokens);
         auto statement = parser.parse(1);
 
-        if (statement == nullptr) return 65;
+        if (!statement) return 65;
         
         auto printer = lox::ASTPrinter();
         std::cout << printer.print(statement) << std::endl;
@@ -64,7 +66,7 @@ int main(int argc, char *argv[]) {
         auto parser = lox::Parser(tokens);
         auto statement = parser.parse(1);
 
-        if (statement == nullptr) return 65;
+        if (!statement) return 65;
 
         auto interpreter = lox::Interpreter();
         interpreter.interpret(statement);
